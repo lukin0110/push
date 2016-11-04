@@ -1,16 +1,7 @@
-# push
+# Push
 
-## Build
-```
-$ docker-compose run app bash
-$ env GOOS=linux go build -v github.com/lukin0110/push/cmd/push/
-$ ./push
-```
-
-or:
+Share a file from the command line.
 
 ```
-$ docker-compose run app bash
-$ env GOOS=linux go install -v github.com/lukin0110/push/cmd/push/
-$ push
+$ push README.md
 ```
