@@ -10,7 +10,7 @@ import (
     "io/ioutil"
 )
 
-const Url string = "https://push.kiwi"
+const Url string = "https://push.kiwi/"
 const Version string = "0.0.1"
 const UsageString string =
 `Usage: push [OPTIONS] file...
@@ -44,7 +44,12 @@ func UploadFile(url string, file string, email string) (string, error) {
 
     //req.Header.Set("Content-Type", "text/markdown; charset=UTF-8")
 
+    //tr := &http.Transport{
+    //    TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+    //}
+    //client := &http.Client{Transport: tr}
     client := &http.Client{}
+
     res, err := client.Do(req)
     defer res.Body.Close()
     if (err != nil) {
@@ -103,17 +108,17 @@ func main() {
 
     for _, v := range flag.Args() {
         var err error
-        fullpath, err := filepath.Abs(v)
+        fullPath, err := filepath.Abs(v)
 
-        if _, err1 := os.Stat(fullpath); err1 == nil {
-            filename := filepath.Base(fullpath)
-            result, err := UploadFile(Url + filename, fullpath, email)
+        if _, err1 := os.Stat(fullPath); err1 == nil {
+            filename := filepath.Base(fullPath)
+            result, err := UploadFile(Url + filename, fullPath, email)
 
             if (err == nil) {
                 fmt.Println(result)
             }
         } else {
-            err = fmt.Errorf("Doesn't exist: %s\n", fullpath)
+            err = fmt.Errorf("Doesn't exist: %s\n", fullPath)
         }
 
         if err != nil {
