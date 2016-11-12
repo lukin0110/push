@@ -22,7 +22,7 @@ Options:
 
  -e, --email    Share via email
  -h, --help     Print usage
- -h, --version  Print version information and quit
+ -v, --version  Print version information and quit
 
 Examples:
 
@@ -40,6 +40,10 @@ func UploadFile(url string, file string, email string) (string, error) {
     req, err := http.NewRequest("PUT", url, f)
     if (err != nil) {
         return "", err
+    }
+
+    if email != "" {
+        req.Header.Set("x-email", email)
     }
 
     //req.Header.Set("Content-Type", "text/markdown; charset=UTF-8")
@@ -87,8 +91,7 @@ func main() {
     	fmt.Fprintln(os.Stderr, "See 'push --help'.")
     }
 
-    // dereference it
-    email := *flagString("email", "e", "", "Share via email")
+    email := flagString("email", "e", "", "Share via email")
     help := flagBool("help", "h", false, "Print usage")
     version := flagBool("version", "v", false, "Print version information and quit")
     flag.Parse()
@@ -112,7 +115,7 @@ func main() {
 
         if _, err1 := os.Stat(fullPath); err1 == nil {
             filename := filepath.Base(fullPath)
-            result, err := UploadFile(Url + filename, fullPath, email)
+            result, err := UploadFile(Url + filename, fullPath, *email)
 
             if (err == nil) {
                 fmt.Println(result)
