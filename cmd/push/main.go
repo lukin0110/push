@@ -45,8 +45,10 @@ func UploadFile(url string, file string, email string) (string, error) {
     if email != "" {
         req.Header.Set("x-email", email)
     }
-
-    //req.Header.Set("Content-Type", "text/markdown; charset=UTF-8")
+    fileStat, err1 := f.Stat()
+    if err1 == nil {
+        req.ContentLength = fileStat.Size()
+    }
 
     //tr := &http.Transport{
     //    TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
@@ -55,13 +57,15 @@ func UploadFile(url string, file string, email string) (string, error) {
     client := &http.Client{}
 
     res, err := client.Do(req)
-    defer res.Body.Close()
     if (err != nil) {
-        return "", nil
+        return "", err
+    } else {
+        defer res.Body.Close()
     }
 
     if(res.StatusCode != http.StatusOK) {
-        return "", fmt.Errorf("bad status: %s", res.Status)
+        bs, _ := ioutil.ReadAll(res.Body)
+        return "", fmt.Errorf("bad status: %s, %s", res.Status, strings.Replace(string(bs), "\n", "", -1))
     } else {
         bs, err1 := ioutil.ReadAll(res.Body)
         if (err1 != nil) {
@@ -119,6 +123,8 @@ func main() {
 
             if (err == nil) {
                 fmt.Println(result)
+            } else {
+                fmt.Println(err)
             }
         } else {
             err = fmt.Errorf("Doesn't exist: %s\n", fullPath)
