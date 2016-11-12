@@ -22,5 +22,12 @@ ENV GOPATH /go
 # Set workdir
 WORKDIR /go/src/github.com/lukin0110/push
 
+# Add the entrypoint.sh
+COPY deployment/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+RUN chmod ugo+x /usr/local/bin/docker-entrypoint.sh
+ENTRYPOINT ["docker-entrypoint.sh"]
+
 # Upload ipchecker source
 COPY . /go/src/github.com/lukin0110/push
+# Run bash by default
+CMD ["bash"]
