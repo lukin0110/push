@@ -28,7 +28,7 @@ RUN go get -u github.com/kardianos/govendor
 WORKDIR /go/src/github.com/lukin0110/push
 
 # Add the entrypoint.sh
-COPY deployment/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+COPY contrib/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 RUN chmod ugo+x /usr/local/bin/docker-entrypoint.sh
 ENTRYPOINT ["docker-entrypoint.sh"]
 
