@@ -8,6 +8,10 @@ import (
     "path/filepath"
     "strings"
     "io/ioutil"
+    "io"
+    "golang.org/x/crypto/openpgp"
+    "golang.org/x/crypto/openpgp/packet"
+    "path"
 )
 
 const Url string = "https://push.kiwi/"
@@ -20,9 +24,10 @@ Share a file from the command line. It returns an unique url to share.
 
 Options:
 
- -e, --email    Share via email
- -h, --help     Print usage
- -v, --version  Print version information and quit
+ -e, --email        Share files via email
+ -p, --passphrase   Protect files with a password
+ -h, --help         Print usage
+ -v, --version      Print version information and quit
 
 Examples:
 
@@ -87,15 +92,54 @@ func flagString(nameLong string, nameShort string, value string, usage string) *
     return result
 }
 
+func encrypt(fullPath string, passPhrase string) (resultFile *os.File, err error) {
+    filename := path.Base(fullPath)
+    stats, err := os.Stat(fullPath)
+    if err != nil {
+        return
+    }
+    hints := &openpgp.FileHints{IsBinary: true, FileName: filename, ModTime: stats.ModTime()}
+
+    var config *packet.Config = &packet.Config{
+        DefaultCompressionAlgo: packet.CompressionNone,
+        CompressionConfig: &packet.CompressionConfig{packet.DefaultCompression},
+    }
+
+    sourceFile, err := os.Open(fullPath)
+    if err != nil {
+        return
+    }
+    defer sourceFile.Close()
+
+    resultFile, err = ioutil.TempFile(filepath.Dir(fullPath), ".pushKiwiPGP")
+    if err != nil {
+        return
+    }
+    defer resultFile.Close()
+
+    plaintext, err := openpgp.SymmetricallyEncrypt(resultFile, []byte(passPhrase), hints, config)
+    if err != nil {
+        return
+    }
+    defer plaintext.Close()
+
+    // Copy original contents the the writer created previously
+    _, err = io.Copy(plaintext, sourceFile)
+
+    return
+}
+
 // Main function for the push command. Parses a few flag (optional) options and takes a few file, or more files, as
 // command line arguments. All passed and existing files will be pushed, they will all return a shareable url.
 func main() {
+    // runtime.GOMAXPROCS(runtime.NumCPU() * 2)
     // Overwrite the default help message
     flag.Usage = func() {
     	fmt.Fprintln(os.Stderr, "See 'push --help'.")
     }
 
-    email := flagString("email", "e", "", "Share via email")
+    email := flagString("email", "e", "", "Share files via email")
+    passPhrase := flagString("passphrase", "p", "", "Protect files with a password")
     help := flagBool("help", "h", false, "Print usage")
     version := flagBool("version", "v", false, "Print version information and quit")
     flag.Parse()
@@ -113,15 +157,31 @@ func main() {
         os.Exit(0)
     }
 
-    for _, v := range flag.Args() {
+    var toRemove = make([]string, len(flag.Args()))
+
+    for index, v := range flag.Args() {
         var err error
         fullPath, err := filepath.Abs(v)
 
         if _, err1 := os.Stat(fullPath); err1 == nil {
-            filename := filepath.Base(fullPath)
-            result, err := UploadFile(Url + filename, fullPath, *email)
+            var uploadPath string
+            var filename string = filepath.Base(fullPath)
 
-            if (err == nil) {
+            if *passPhrase != "" {
+                var file *os.File
+                file, err = encrypt(fullPath, *passPhrase)
+                uploadPath, _ = filepath.Abs(file.Name())
+                filename += ".gpg"
+                toRemove[index] = uploadPath
+
+            } else {
+                uploadPath = fullPath
+            }
+
+            result, err := UploadFile(Url + filename, uploadPath, *email)
+            //fmt.Printf("Uploading: %s, %s\n", uploadPath, *email); result := filename
+
+            if err == nil {
                 fmt.Println(result)
             } else {
                 fmt.Println(err)
@@ -132,6 +192,13 @@ func main() {
 
         if err != nil {
             fmt.Print(err)
+        }
+    }
+
+    // Cleanup temporary encrypted files
+    for _, v := range toRemove {
+        if v != "" {
+            os.Remove(v)
         }
     }
 }
