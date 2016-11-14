@@ -3,17 +3,11 @@ package main
 import (
     "flag"
     "fmt"
-    "net/http"
     "os"
     "path/filepath"
-    "strings"
-    "io/ioutil"
-    "io"
-    "golang.org/x/crypto/openpgp"
-    "golang.org/x/crypto/openpgp/packet"
-    "path"
-    ver "github.com/lukin0110/push/version"
     "github.com/docker/go-units"
+    ver "github.com/lukin0110/push/version"
+    "github.com/lukin0110/push/file"
 )
 
 const Url string = "https://push.kiwi/"
@@ -38,51 +32,6 @@ $ push --email dude@example.com ./nginx.conf
 const MAX_BYTES int64 = 100 * 1024 * 1024 // 100 MegaByte
 
 
-func UploadFile(url string, file string, email string) (string, error) {
-    f, err := os.Open(file)
-    if (err != nil) {
-        return "", err
-    }
-    defer f.Close()
-
-    req, err := http.NewRequest("PUT", url, f)
-    if (err != nil) {
-        return "", err
-    }
-
-    if email != "" {
-        req.Header.Set("x-email", email)
-    }
-    fileStat, err1 := f.Stat()
-    if err1 == nil {
-        req.ContentLength = fileStat.Size()
-    }
-
-    //tr := &http.Transport{
-    //    TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-    //}
-    //client := &http.Client{Transport: tr}
-    client := &http.Client{}
-
-    res, err := client.Do(req)
-    if (err != nil) {
-        return "", err
-    } else {
-        defer res.Body.Close()
-    }
-
-    if(res.StatusCode != http.StatusOK) {
-        bs, _ := ioutil.ReadAll(res.Body)
-        return "", fmt.Errorf("bad status: %s, %s", res.Status, strings.Replace(string(bs), "\n", "", -1))
-    } else {
-        bs, err1 := ioutil.ReadAll(res.Body)
-        if (err1 != nil) {
-            return "", err
-        }
-        return strings.Replace(string(bs), "\n", "", -1), nil
-    }
-}
-
 func flagBool(nameLong string, nameShort string, value bool, usage string) *bool {
     result := flag.Bool(nameLong, value, usage)
     flag.BoolVar(result, nameShort, value, usage)
@@ -95,47 +44,10 @@ func flagString(nameLong string, nameShort string, value string, usage string) *
     return result
 }
 
-func encrypt(fullPath string, passPhrase string) (resultFile *os.File, err error) {
-    filename := path.Base(fullPath)
-    stats, err := os.Stat(fullPath)
-    if err != nil {
-        return
-    }
-    hints := &openpgp.FileHints{IsBinary: true, FileName: filename, ModTime: stats.ModTime()}
-
-    var config *packet.Config = &packet.Config{
-        DefaultCompressionAlgo: packet.CompressionNone,
-        CompressionConfig: &packet.CompressionConfig{packet.DefaultCompression},
-    }
-
-    sourceFile, err := os.Open(fullPath)
-    if err != nil {
-        return
-    }
-    defer sourceFile.Close()
-
-    resultFile, err = ioutil.TempFile(filepath.Dir(fullPath), ".pushKiwiPGP")
-    if err != nil {
-        return
-    }
-    defer resultFile.Close()
-
-    plaintext, err := openpgp.SymmetricallyEncrypt(resultFile, []byte(passPhrase), hints, config)
-    if err != nil {
-        return
-    }
-    defer plaintext.Close()
-
-    // Copy original contents the the writer created previously
-    _, err = io.Copy(plaintext, sourceFile)
-
-    return
-}
 
 // Main function for the push command. Parses a few flag (optional) options and takes a few file, or more files, as
 // command line arguments. All passed and existing files will be pushed, they will all return a shareable url.
 func main() {
-    // runtime.GOMAXPROCS(runtime.NumCPU() * 2)
     // Overwrite the default help message
     flag.Usage = func() {
     	fmt.Fprintln(os.Stderr, "See 'push --help'.")
@@ -173,15 +85,15 @@ func main() {
 
             if stat.Size() < MAX_BYTES {
                 if *passPhrase != "" {
-                    var file *os.File
-                    file, err = encrypt(fullPath, *passPhrase)
-                    uploadPath, _ = filepath.Abs(file.Name())
+                    var f *os.File
+                    f, err = file.Encrypt(fullPath, *passPhrase)
+                    uploadPath, _ = filepath.Abs(f.Name())
                     filename += ".gpg"
                     toRemove[index] = uploadPath
                 }
 
                 var result string
-                result, err = UploadFile(Url + filename, uploadPath, *email)
+                result, err = file.UploadFile(Url + filename, uploadPath, *email)
                 //fmt.Printf("Uploading: %s, %s\n", uploadPath, *email); result := filename
 
                 if err == nil {
