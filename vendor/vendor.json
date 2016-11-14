@@ -3,6 +3,14 @@
 	"ignore": "test",
 	"package": [
 		{
+			"checksumSHA1": "Ufrex/PpclfqVToYNvjB1y4dg0A=",
+			"path": "github.com/docker/go-units",
+			"revision": "f2d77a61e3c169b43402a0a1e84f06daf29b8190",
+			"revisionTime": "2016-06-13T21:20:13Z",
+			"version": "v0.3.1",
+			"versionExact": "v0.3.1"
+		},
+		{
 			"checksumSHA1": "TT1rac6kpQp2vz24m5yDGUNQ/QQ=",
 			"path": "golang.org/x/crypto/cast5",
 			"revision": "9477e0b78b9ac3d0b03822fd95422e2fe07627cd",

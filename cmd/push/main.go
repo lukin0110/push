@@ -12,7 +12,8 @@ import (
     "golang.org/x/crypto/openpgp"
     "golang.org/x/crypto/openpgp/packet"
     "path"
-    v "github.com/lukin0110/push/version"
+    ver "github.com/lukin0110/push/version"
+    "github.com/docker/go-units"
 )
 
 const Url string = "https://push.kiwi/"
@@ -34,6 +35,8 @@ Examples:
 $ push ./nginx.conf
 $ push --email dude@example.com ./nginx.conf
 `
+const MAX_BYTES int64 = 100 * 1024 * 1024 // 100 MegaByte
+
 
 func UploadFile(url string, file string, email string) (string, error) {
     f, err := os.Open(file)
@@ -148,7 +151,7 @@ func main() {
         fmt.Println(UsageString)
         os.Exit(0)
     } else if *version {
-        fmt.Println(v.Full())
+        fmt.Println(ver.Full())
         os.Exit(0)
     }
 
@@ -161,44 +164,43 @@ func main() {
 
     for index, v := range flag.Args() {
         var err error
+        var stat os.FileInfo
         fullPath, err := filepath.Abs(v)
 
-        if _, err1 := os.Stat(fullPath); err1 == nil {
-            var uploadPath string
+        if stat, err = os.Stat(fullPath); err == nil {
+            var uploadPath string = fullPath
             var filename string = filepath.Base(fullPath)
 
-            if *passPhrase != "" {
-                var file *os.File
-                file, err = encrypt(fullPath, *passPhrase)
-                uploadPath, _ = filepath.Abs(file.Name())
-                filename += ".gpg"
-                toRemove[index] = uploadPath
+            if stat.Size() < MAX_BYTES {
+                if *passPhrase != "" {
+                    var file *os.File
+                    file, err = encrypt(fullPath, *passPhrase)
+                    uploadPath, _ = filepath.Abs(file.Name())
+                    filename += ".gpg"
+                    toRemove[index] = uploadPath
+                }
 
+                var result string
+                result, err = UploadFile(Url + filename, uploadPath, *email)
+                //fmt.Printf("Uploading: %s, %s\n", uploadPath, *email); result := filename
+
+                if err == nil {
+                    fmt.Println(result)
+                }
             } else {
-                uploadPath = fullPath
+                err = fmt.Errorf("Max file size (%s) exceeded for %s", units.BytesSize(float64(MAX_BYTES)), fullPath)
             }
-
-            result, err := UploadFile(Url + filename, uploadPath, *email)
-            //fmt.Printf("Uploading: %s, %s\n", uploadPath, *email); result := filename
-
-            if err == nil {
-                fmt.Println(result)
-            } else {
-                fmt.Println(err)
-            }
-        } else {
-            err = fmt.Errorf("Doesn't exist: %s\n", fullPath)
         }
 
         if err != nil {
-            fmt.Print(err)
+            fmt.Println(err)
         }
     }
 
     // Cleanup temporary encrypted files
-    for _, fp := range toRemove {
-        if fp != "" {
-            os.Remove(fp)
+    for _, v := range toRemove {
+        if v != "" {
+            os.Remove(v)
         }
     }
 }
