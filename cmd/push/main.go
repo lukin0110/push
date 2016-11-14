@@ -196,9 +196,9 @@ func main() {
     }
 
     // Cleanup temporary encrypted files
-    for _, v := range toRemove {
-        if v != "" {
-            os.Remove(v)
+    for _, fp := range toRemove {
+        if fp != "" {
+            os.Remove(fp)
         }
     }
 }
