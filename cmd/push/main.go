@@ -12,10 +12,10 @@ import (
     "golang.org/x/crypto/openpgp"
     "golang.org/x/crypto/openpgp/packet"
     "path"
+    v "github.com/lukin0110/push/version"
 )
 
 const Url string = "https://push.kiwi/"
-const Version string = "0.0.1"
 const UsageString string =
 `Usage: push [OPTIONS] file...
        push [--help | --version]
@@ -148,7 +148,7 @@ func main() {
         fmt.Println(UsageString)
         os.Exit(0)
     } else if *version {
-        fmt.Println(Version)
+        fmt.Println(v.Full())
         os.Exit(0)
     }
 
