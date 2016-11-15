@@ -13,14 +13,22 @@ import (
     "io"
 )
 
-func UploadFile(url string, file string, email string) (string, error) {
-    f, err := os.Open(file)
-    if (err != nil) {
-        return "", err
-    }
-    defer f.Close()
+// Wrapper around io.Reader.
+// Calls the Read func on the Reader and also updates the 'Reporter' function
+type ProgressReader struct {
+    io.Reader
+    Reporter func(r int64)
+}
 
-    req, err := http.NewRequest("PUT", url, f)
+func (pr *ProgressReader) Read(p []byte) (n int, err error) {
+    n, err = pr.Reader.Read(p)
+    pr.Reporter(int64(n))
+    return
+}
+
+func UploadFile(url string, inputFile os.File, inputReader io.Reader, email string) (string, error) {
+    defer inputFile.Close()
+    req, err := http.NewRequest("PUT", url, inputReader)
     if (err != nil) {
         return "", err
     }
@@ -28,7 +36,7 @@ func UploadFile(url string, file string, email string) (string, error) {
     if email != "" {
         req.Header.Set("x-email", email)
     }
-    fileStat, err1 := f.Stat()
+    fileStat, err1 := inputFile.Stat()
     if err1 == nil {
         req.ContentLength = fileStat.Size()
     }

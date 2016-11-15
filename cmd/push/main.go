@@ -8,6 +8,7 @@ import (
     "github.com/docker/go-units"
     ver "github.com/lukin0110/push/version"
     "github.com/lukin0110/push/file"
+    "github.com/cheggaaa/pb"
 )
 
 const Url string = "https://push.kiwi/"
@@ -73,6 +74,7 @@ func main() {
     }
 
     var toRemove = make([]string, len(flag.Args()))
+    var results = make([]string, len(flag.Args()))
 
     for index, v := range flag.Args() {
         var err error
@@ -92,12 +94,21 @@ func main() {
                     toRemove[index] = uploadPath
                 }
 
+                // Console progress bar for Golang
+                // https://github.com/cheggaaa/pb
+                uploadFile, err := os.Open(uploadPath)
+                stats, err := os.Stat(uploadPath)
+                bar := pb.New(int(stats.Size())).SetUnits(pb.U_BYTES).Prefix(filename)
+                bar.Start()
+                reader := bar.NewProxyReader(uploadFile)
+
                 var result string
-                result, err = file.UploadFile(Url + filename, uploadPath, *email)
+                result, err = file.UploadFile(Url + filename, *uploadFile, reader, *email)
                 //fmt.Printf("Uploading: %s, %s\n", uploadPath, *email); result := filename
+                bar.Finish()
 
                 if err == nil {
-                    fmt.Println(result)
+                    results[index] = result
                 }
             } else {
                 err = fmt.Errorf("Max file size (%s) exceeded for %s", units.BytesSize(float64(MAX_BYTES)), fullPath)
@@ -113,6 +124,13 @@ func main() {
     for _, v := range toRemove {
         if v != "" {
             os.Remove(v)
+        }
+    }
+
+    // Print all results
+    for _, v := range results {
+        if v != "" {
+            fmt.Println(v)
         }
     }
 }
