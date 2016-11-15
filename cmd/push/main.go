@@ -8,11 +8,7 @@ import (
     "github.com/docker/go-units"
     ver "github.com/lukin0110/push/version"
     "github.com/lukin0110/push/file"
-    "github.com/briandowns/spinner"
-    "math/rand"
-    "time"
     "github.com/cheggaaa/pb"
-    "sync"
 )
 
 const Url string = "https://push.kiwi/"
