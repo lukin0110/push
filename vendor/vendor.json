@@ -3,12 +3,43 @@
 	"ignore": "test",
 	"package": [
 		{
+			"checksumSHA1": "uagmzllc4Q9RZf0LpWv2P0pLnQs=",
+			"path": "github.com/cheggaaa/pb",
+			"revision": "dd61faab99a777c652bb680e37715fe0cb549856",
+			"revisionTime": "2016-10-26T15:03:33Z",
+			"version": "v1.0.6",
+			"versionExact": "v1.0.6"
+		},
+		{
+			"path": "github.com/cheggaaa/pb@",
+			"revision": "v1.0.6",
+			"version": "v1.0.6"
+		},
+		{
 			"checksumSHA1": "Ufrex/PpclfqVToYNvjB1y4dg0A=",
 			"path": "github.com/docker/go-units",
 			"revision": "f2d77a61e3c169b43402a0a1e84f06daf29b8190",
 			"revisionTime": "2016-06-13T21:20:13Z",
 			"version": "v0.3.1",
 			"versionExact": "v0.3.1"
+		},
+		{
+			"checksumSHA1": "x77xUarDfVxctJMAJPCQzlYk8JM=",
+			"path": "github.com/fatih/color",
+			"revision": "bf82308e8c8546dc2b945157173eb8a959ae9505",
+			"revisionTime": "2016-10-25T12:05:01Z"
+		},
+		{
+			"checksumSHA1": "I4njd26dG5hxFT2nawuByM4pxzY=",
+			"path": "github.com/mattn/go-colorable",
+			"revision": "d228849504861217f796da67fae4f6e347643f15",
+			"revisionTime": "2016-11-03T16:00:40Z"
+		},
+		{
+			"checksumSHA1": "xZuhljnmBysJPta/lMyYmJdujCg=",
+			"path": "github.com/mattn/go-isatty",
+			"revision": "66b8e73f3f5cda9f96b69efd03dd3d7fc4a5cdb8",
+			"revisionTime": "2016-08-06T12:27:52Z"
 		},
 		{
 			"checksumSHA1": "TT1rac6kpQp2vz24m5yDGUNQ/QQ=",
@@ -51,6 +82,12 @@
 			"path": "golang.org/x/crypto/openpgp/s2k",
 			"revision": "9477e0b78b9ac3d0b03822fd95422e2fe07627cd",
 			"revisionTime": "2016-10-31T15:37:30Z"
+		},
+		{
+			"checksumSHA1": "KqecwXo3OO+p4N+E9RhlHvl9I+w=",
+			"path": "golang.org/x/sys/unix",
+			"revision": "b699b7032584f0953262cb2788a0ca19bb494703",
+			"revisionTime": "2016-11-10T11:58:56Z"
 		}
 	],
 	"rootPath": "github.com/lukin0110/push"
