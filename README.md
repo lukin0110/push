@@ -34,3 +34,9 @@ $ push ./nginx.conf
 $ push --email dude@example.com ./nginx.conf
 $ push -p Security123 slack.dmg
 ```
+
+## Roadmap
+
+* [Add zip compression](https://github.com/lukin0110/push/issues/3)
+* [Parallel uploads](https://github.com/lukin0110/push/issues/4)
+* 
