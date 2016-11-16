@@ -40,3 +40,5 @@ $ push -p Security123 slack.dmg
 * [Add zip compression](https://github.com/lukin0110/push/issues/3)
 * [Parallel uploads](https://github.com/lukin0110/push/issues/4)
 * [Capture sender info](https://github.com/lukin0110/push/issues/5)
+* [Create brew package](https://github.com/lukin0110/push/issues/6)
+
