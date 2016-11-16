@@ -13,19 +13,6 @@ import (
     "io"
 )
 
-// Wrapper around io.Reader.
-// Calls the Read func on the Reader and also updates the 'Reporter' function
-type ProgressReader struct {
-    io.Reader
-    Reporter func(r int64)
-}
-
-func (pr *ProgressReader) Read(p []byte) (n int, err error) {
-    n, err = pr.Reader.Read(p)
-    pr.Reporter(int64(n))
-    return
-}
-
 func UploadFile(url string, inputFile os.File, inputReader io.Reader, email string) (string, error) {
     defer inputFile.Close()
     req, err := http.NewRequest("PUT", url, inputReader)
