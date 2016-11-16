@@ -6,7 +6,7 @@ Share a file from the command line.
 $ push README.md
 ```
 
-## Install
+## Install or update
 
 OSX / Debian / Ubuntu:
 ```
