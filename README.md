@@ -3,12 +3,13 @@
 Share a file from the command line.
 
 ```
-$ push README.md
+$ push slack.dmg
+https://push.kiwi/HrfUfSAzj/slack.dmg
 ```
 
 ## Install
 
-OSX / Debian / Ubuntu:
+OSX / Linux:
 ```
 curl -sL https://raw.githubusercontent.com/lukin0110/push/master/install.sh | sudo -E bash -
 ```
@@ -19,7 +20,8 @@ curl -sL https://raw.githubusercontent.com/lukin0110/push/master/install.sh | su
 Usage: push [OPTIONS] file...
        push [--help | --version]
 
-Share a file from the command line. It returns an unique url to share.
+Share a file from the command line. It returns an unique url to share. The file argument is
+required, you can specify multiple files.
 
 Options:
 
@@ -31,6 +33,6 @@ Options:
 Examples:
 
 $ push ./nginx.conf
-$ push --email=dude@example.com ./nginx.conf
-$ push -p=Security123 slack.dmg
+$ push --email=jeffrey@lebowski.org ./nginx.conf
+$ push --passphrase=Security007 ./nginx.conf
 ```

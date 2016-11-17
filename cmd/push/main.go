@@ -30,6 +30,7 @@ Examples:
 
 $ push ./nginx.conf
 $ push --email=jeffrey@lebowski.org ./nginx.conf
+$ push --passphrase=Security007 ./nginx.conf
 `
 const MAX_BYTES int64 = 100 * 1024 * 1024 // 100 MegaByte
 
