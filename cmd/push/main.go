@@ -16,7 +16,8 @@ const UsageString string =
 `Usage: push [OPTIONS] file...
        push [--help | --version]
 
-Share a file from the command line. It returns an unique url to share.
+Share a file from the command line. It returns an unique url to share. The file argument is
+required, you can specify multiple files.
 
 Options:
 
@@ -28,7 +29,7 @@ Options:
 Examples:
 
 $ push ./nginx.conf
-$ push --email dude@example.com ./nginx.conf
+$ push --email=jeffrey@lebowski.org ./nginx.conf
 `
 const MAX_BYTES int64 = 100 * 1024 * 1024 // 100 MegaByte
 
@@ -69,6 +70,11 @@ func main() {
         os.Exit(0)
     } else if *kiwi {
         fmt.Print(ver.Kiwi)
+        os.Exit(0)
+    }
+
+    if *email != "" && !file.IsEmail(*email) {
+        fmt.Printf("Invalid email: %s\n", *email)
         os.Exit(0)
     }
 

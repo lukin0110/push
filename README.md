@@ -31,6 +31,6 @@ Options:
 Examples:
 
 $ push ./nginx.conf
-$ push --email dude@example.com ./nginx.conf
-$ push -p Security123 slack.dmg
+$ push --email=dude@example.com ./nginx.conf
+$ push -p=Security123 slack.dmg
 ```
