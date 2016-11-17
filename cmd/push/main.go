@@ -57,6 +57,7 @@ func main() {
     email := flagString("email", "e", "", "Share files via email")
     passPhrase := flagString("passphrase", "p", "", "Protect files with a password")
     help := flagBool("help", "h", false, "Print usage")
+    kiwi := flagBool("kiwi", "k", false, "Show a ascii art")
     version := flagBool("version", "v", false, "Print version information and quit")
     flag.Parse()
 
@@ -65,6 +66,9 @@ func main() {
         os.Exit(0)
     } else if *version {
         fmt.Println(ver.Full())
+        os.Exit(0)
+    } else if *kiwi {
+        fmt.Print(ver.Kiwi)
         os.Exit(0)
     }
 
