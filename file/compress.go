@@ -33,7 +33,6 @@ func CalculateSize(items ...string) (total int64, err error) {
 	}
 
 	if !info.IsDir() {
-	    fmt.Println("BANAAN 2")
 	    total += info.Size()
 	} else {
 	    filepath.Walk(value, func(path string, info os.FileInfo, err error) error {
