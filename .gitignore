@@ -29,5 +29,4 @@ src/github.com
 vendor/pkg
 vendor/github.com/lukin0110/push
 bin
-data
-
+output

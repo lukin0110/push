@@ -4,4 +4,5 @@ services:
       build: .
       volumes:
         - .:/go/src/github.com/lukin0110/push
-        - ./bin:/go/bin
+#        - ./bin:/go/bin
+        - ./output:/output
