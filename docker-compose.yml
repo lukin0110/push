@@ -1,5 +1,7 @@
-app:
-    build: .
-    volumes:
-      - .:/go/src/github.com/lukin0110/push
-      - ./bin:/go/bin
+version: "2"
+services:
+  app:
+      build: .
+      volumes:
+        - .:/go/src/github.com/lukin0110/push
+        - ./bin:/go/bin

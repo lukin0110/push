@@ -7,7 +7,7 @@ import (
     "path/filepath"
     "strings"
     "errors"
-    "fmt"
+    "io/ioutil"
 )
 
 // Similar to: http://stackoverflow.com/questions/26050380/go-tracking-post-request-progress
@@ -22,6 +22,7 @@ func (pw *ProgressWriter) Write(p []byte) (n int, err error) {
     return
 }
 
+// Calculates to total amount of bytes from a list of files/directories
 func CalculateSize(items ...string) (total int64, err error) {
     total = 0
 
@@ -56,20 +57,21 @@ func CalculateSize(items ...string) (total int64, err error) {
     return
 }
 
-
+// Creates a zipfile from a list of files/directories
+//
 // http://blog.ralch.com/tutorial/golang-working-with-zip/
 func ZippyMcZipface(targetName string, reporter func(w int64), items ...string) (err error) {
     if reporter == nil {
 	return errors.New("reporter function can't be nil")
     }
 
-    zipfile, err := os.Create(targetName)
+    tempFile, err := ioutil.TempFile(os.TempDir(), "pushKiwiTmp")
     if err != nil {
 	return
     }
-    defer zipfile.Close()
+    defer tempFile.Close()
 
-    archive := zip.NewWriter(zipfile)
+    archive := zip.NewWriter(tempFile)
     defer archive.Close()
 
     for _, value := range items {
@@ -124,5 +126,14 @@ func ZippyMcZipface(targetName string, reporter func(w int64), items ...string) 
 	})
     }
 
+    // Move temp file to target
+    absPath, err := filepath.Abs(targetName)
+    if err != nil {
+	return
+    }
+
+    // Won't work within a docker container if volumes are mounted. Will produce an error:
+    // rename /tmp/pushKiwiTmp706257135 /go/src/github.com/lukin0110/push/test.zip: invalid cross-device link
+    err = os.Rename(tempFile.Name(), absPath)
     return
 }
