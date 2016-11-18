@@ -41,9 +41,14 @@ func CalculateSize(items ...string) (total int64, err error) {
 		    return err
 		}
 
-		info, err = os.Stat(path)
+		info, err = os.Lstat(path)
 		if err != nil {
 		    return err
+		}
+
+		// Ignore symlinks
+		if info.Mode()&os.ModeSymlink == os.ModeSymlink {
+		    return nil
 		}
 
 		if !info.IsDir() {
@@ -85,9 +90,14 @@ func ZippyMcZipface(targetName string, reporter func(w int64), items ...string) 
 	    baseDir = filepath.Base(value)
 	}
 
-	filepath.Walk(value, func(path string, info os.FileInfo, err error) error {
+	err = filepath.Walk(value, func(path string, info os.FileInfo, err error) error {
 	    if err != nil {
 		return err
+	    }
+
+	    // Ignore symlinks
+	    if info.Mode() & os.ModeSymlink == os.ModeSymlink {
+		return nil
 	    }
 
 	    header, err := zip.FileInfoHeader(info)
@@ -126,14 +136,17 @@ func ZippyMcZipface(targetName string, reporter func(w int64), items ...string) 
 	})
     }
 
-    // Move temp file to target
-    absPath, err := filepath.Abs(targetName)
-    if err != nil {
-	return
+    if err == nil {
+	// Move temp file to target
+	absPath, err := filepath.Abs(targetName)
+
+	if err == nil {
+	    // Won't work within a docker container if volumes are mounted. Will produce an error:
+	    // rename /tmp/pushKiwiTmp706257135 /go/src/github.com/lukin0110/push/test.zip: invalid cross-device link
+	    err = os.Rename(tempFile.Name(), absPath)
+	    //fmt.Printf("ERR.7 %s\n", err)
+	}
     }
 
-    // Won't work within a docker container if volumes are mounted. Will produce an error:
-    // rename /tmp/pushKiwiTmp706257135 /go/src/github.com/lukin0110/push/test.zip: invalid cross-device link
-    err = os.Rename(tempFile.Name(), absPath)
     return
 }

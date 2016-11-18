@@ -147,7 +147,7 @@ func main() {
             }
 
             zipfileName := "zippy.zip"
-            err := file.ZippyMcZipface(zipfileName, reporter, flag.Args()...)
+            err = file.ZippyMcZipface(zipfileName, reporter, flag.Args()...)
             bar.Finish()
 
             if err == nil {
