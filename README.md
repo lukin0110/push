@@ -36,3 +36,9 @@ $ push ./nginx.conf
 $ push --email=jeffrey@lebowski.org ./nginx.conf
 $ push --passphrase=Security007 ./nginx.conf
 ```
+
+## Roadmap
+
+* [Add zip compression](https://github.com/lukin0110/push/issues/3)
+* [Parallel uploads](https://github.com/lukin0110/push/issues/4)
+* [Capture sender info](https://github.com/lukin0110/push/issues/5)
