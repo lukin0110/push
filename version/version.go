@@ -7,7 +7,7 @@ import (
 const (
     Proto = "0"
     Major = "0"
-    Minor = "2"
+    Minor = "2beta"
 )
 
 // $ figlet -m2 push.kiwi

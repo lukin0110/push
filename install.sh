@@ -10,7 +10,7 @@ case "$(uname -s)" in
     Darwin)
         echo 'Mac OS X'
         temp_file=$(mktemp)
-        curl -o "$temp_file" -L https://github.com/lukin0110/push/releases/download/0.0.1a/push.x86.darwin
+        curl -o "$temp_file" -L https://github.com/lukin0110/push/releases/download/0.0.2beta/push.x86.darwin
         mv "$temp_file" /usr/local/bin/push
         chmod 755 /usr/local/bin/push
     ;;
@@ -18,7 +18,7 @@ case "$(uname -s)" in
     Linux)
         echo 'Linux'
         temp_file=$(mktemp)
-        curl -o "$temp_file" -L https://github.com/lukin0110/push/releases/download/0.0.1a/push.x86.linux
+        curl -o "$temp_file" -L https://github.com/lukin0110/push/releases/download/0.0.2beta/push.x86.linux
         mv "$temp_file" /usr/local/bin/push
         chmod 755 /usr/local/bin/push
     ;;
