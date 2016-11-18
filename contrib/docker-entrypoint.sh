@@ -36,11 +36,11 @@ case "$1" in
 
         echo 'Linux arm5'
         env GOOS=linux GOARCH=arm GOARM=5 go install -v github.com/lukin0110/push/cmd/push/
-        cp /go/bin/linux_arm/push /output/push.arm5l.linux
+        cp /go/bin/linux_arm/push /output/push.armv5l.linux
 
         echo 'Linux arm7'
         env GOOS=linux GOARCH=arm GOARM=7 go install -v github.com/lukin0110/push/cmd/push/
-        cp /go/bin/linux_arm/push /output/push.arm7l.linux
+        cp /go/bin/linux_arm/push /output/push.armv7l.linux
     ;;
     mac)
         echo 'Mac OSX'
