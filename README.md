@@ -43,4 +43,4 @@ $ push --passphrase=Security007 ./nginx.conf
 * [Parallel uploads](https://github.com/lukin0110/push/issues/4)
 * [Capture sender info](https://github.com/lukin0110/push/issues/5)
 * [Create brew package](https://github.com/lukin0110/push/issues/6)
-
+* [Create windows Binary](https://github.com/lukin0110/push/issues/8)
