@@ -1,6 +1,6 @@
 # Push
 
-Share a file from the command line.
+Share files from the command line.
 
 ```
 $ push slack.dmg
