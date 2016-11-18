@@ -12,6 +12,7 @@ import (
 )
 
 const Url string = "https://push.kiwi/"
+const MaxBytes int64 = 100 * 1024 * 1024 // 100 MegaByte
 const UsageString string =
 `Usage: push [OPTIONS] file...
        push [--help | --version]
@@ -23,6 +24,7 @@ Options:
 
  -e, --email        Share files via email
  -p, --passphrase   Protect files with a password
+ -z, --zip          Compress files to one archive
  -h, --help         Print usage
  -v, --version      Print version information and quit
 
@@ -32,7 +34,6 @@ $ push ./nginx.conf
 $ push --email=jeffrey@lebowski.org ./nginx.conf
 $ push --passphrase=Security007 ./nginx.conf
 `
-const MAX_BYTES int64 = 100 * 1024 * 1024 // 100 MegaByte
 
 
 func flagBool(nameLong string, nameShort string, value bool, usage string) *bool {
@@ -47,6 +48,50 @@ func flagString(nameLong string, nameShort string, value string, usage string) *
     return result
 }
 
+func HandleFile(filePath string, passPhrase string, email string) (url string, err error) {
+    var stat os.FileInfo
+    fullPath, err := filepath.Abs(filePath)
+
+    if stat, err = os.Stat(fullPath); err == nil {
+        var uploadPath string = fullPath
+        var filename string = filepath.Base(fullPath)
+
+        if stat.Size() < MaxBytes {
+            if passPhrase != "" {
+                var f *os.File
+                f, err = file.Encrypt(fullPath, passPhrase)
+                uploadPath, _ = filepath.Abs(f.Name())
+                filename += ".gpg"
+                defer func() {
+                    os.Remove(uploadPath)
+                }()
+            }
+
+            // Console progress bar for Golang
+            // https://github.com/cheggaaa/pb
+            uploadFile, err := os.Open(uploadPath)
+            if err != nil {
+                return "", err
+            }
+            stats, err := os.Stat(uploadPath)
+            if err != nil {
+                return "", err
+            }
+            bar := pb.New(int(stats.Size())).SetUnits(pb.U_BYTES).Prefix(filename)
+            bar.Start()
+            reader := bar.NewProxyReader(uploadFile)
+
+            url, err = file.UploadFile(Url + filename, *uploadFile, reader, email)
+            //fmt.Printf("Uploading: %s, %s\n", uploadPath, *email); result := filename
+            bar.Finish()
+        } else {
+            err = fmt.Errorf("Max file size (%s) exceeded for %s", units.BytesSize(float64(MaxBytes)), fullPath)
+        }
+    }
+
+    return
+}
+
 
 // Main function for the push command. Parses a few flag (optional) options and takes a few file, or more files, as
 // command line arguments. All passed and existing files will be pushed, they will all return a shareable url.
@@ -58,6 +103,7 @@ func main() {
 
     email := flagString("email", "e", "", "Share files via email")
     passPhrase := flagString("passphrase", "p", "", "Protect files with a password")
+    zip := flagBool("zip", "z", false, "Compress files to one archive")
     help := flagBool("help", "h", false, "Print usage")
     kiwi := flagBool("kiwi", "k", false, "Show a ascii art")
     version := flagBool("version", "v", false, "Print version information and quit")
@@ -84,57 +130,51 @@ func main() {
         os.Exit(0)
     }
 
-    var toRemove = make([]string, len(flag.Args()))
-    var results = make([]string, len(flag.Args()))
+    var results = make([]string, 0) // List of urls all successful uploads
+    var errors = make([]error, 0)   // List of failed uploads (file not found, failed to upload, etc)
 
-    for index, v := range flag.Args() {
-        var err error
-        var stat os.FileInfo
-        fullPath, err := filepath.Abs(v)
+    if *zip {
+        total, err := file.CalculateSize(flag.Args()...)
 
-        if stat, err = os.Stat(fullPath); err == nil {
-            var uploadPath string = fullPath
-            var filename string = filepath.Base(fullPath)
+        if err == nil {
+            bar := pb.New(int(total)).SetUnits(pb.U_BYTES).Prefix("Compressing")
+            bar.Start()
 
-            if stat.Size() < MAX_BYTES {
-                if *passPhrase != "" {
-                    var f *os.File
-                    f, err = file.Encrypt(fullPath, *passPhrase)
-                    uploadPath, _ = filepath.Abs(f.Name())
-                    filename += ".gpg"
-                    toRemove[index] = uploadPath
+            var progressCount int = 0
+            reporter := func(w int64) {
+                progressCount += int(w)
+                bar.Set(progressCount)
+            }
+
+            zipfileName := "zippy.zip"
+            err := file.ZippyMcZipface(zipfileName, reporter, flag.Args()...)
+            bar.Finish()
+
+            if err == nil {
+                // Bye bye zippy
+                defer os.Remove(zipfileName)
+
+                var url string
+                url, err = HandleFile(zipfileName, *passPhrase, *email)
+                if url != "" {
+                    results = append(results, url)
                 }
-
-                // Console progress bar for Golang
-                // https://github.com/cheggaaa/pb
-                uploadFile, err := os.Open(uploadPath)
-                stats, err := os.Stat(uploadPath)
-                bar := pb.New(int(stats.Size())).SetUnits(pb.U_BYTES).Prefix(filename)
-                bar.Start()
-                reader := bar.NewProxyReader(uploadFile)
-
-                var result string
-                result, err = file.UploadFile(Url + filename, *uploadFile, reader, *email)
-                //fmt.Printf("Uploading: %s, %s\n", uploadPath, *email); result := filename
-                bar.Finish()
-
-                if err == nil {
-                    results[index] = result
-                }
-            } else {
-                err = fmt.Errorf("Max file size (%s) exceeded for %s", units.BytesSize(float64(MAX_BYTES)), fullPath)
             }
         }
 
         if err != nil {
-            fmt.Println(err)
+            errors = append(errors, err)
         }
-    }
 
-    // Cleanup temporary encrypted files
-    for _, v := range toRemove {
-        if v != "" {
-            os.Remove(v)
+    } else {
+        // Loopy MacLoopface
+        for _, v := range flag.Args() {
+            url, err := HandleFile(v, *passPhrase, *email)
+            if url != "" {
+                results = append(results, url)
+            } else {
+                errors = append(errors, err)
+            }
         }
     }
 
@@ -142,6 +182,14 @@ func main() {
     for _, v := range results {
         if v != "" {
             fmt.Println(v)
+        }
+    }
+
+    // Print all errors
+    if len(errors) > 0 {
+        fmt.Println("\nErrors:")
+        for _, v := range errors {
+            fmt.Printf(" - %s\n", v)
         }
     }
 }

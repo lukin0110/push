@@ -77,7 +77,7 @@ func ZippyMcZipface(targetName string, reporter func(w int64), items ...string) 
     for _, value := range items {
 	info, err := os.Stat(value)
 	if err != nil {
-	    break
+	    return err
 	}
 
 	var baseDir string
