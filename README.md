@@ -11,7 +11,7 @@ https://push.kiwi/HrfUfSAzj/slack.dmg
 
 OSX / Linux:
 ```
-curl -sL https://raw.githubusercontent.com/lukin0110/push/master/install.sh | sudo -E bash -
+$ sudo curl -sL https://raw.githubusercontent.com/lukin0110/push/master/install.sh | sudo -E bash -
 ```
 
 ## Usage
