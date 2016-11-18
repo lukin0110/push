@@ -24,12 +24,23 @@ case "$1" in
         /bin/bash "${@:2}"
     ;;
     release)
+        # Go building
+        # https://github.com/golang/go/wiki/GoArm
         echo 'Mac OSX'
         env GOOS=darwin go install -v github.com/lukin0110/push/cmd/push/
         cp /go/bin/darwin_amd64/push /output/push.x86.darwin
-        echo 'Linux'
-        env GOOS=linux go install -v github.com/lukin0110/push/cmd/push/
+
+        echo 'Linux amd64'
+        env GOOS=linux GOARCH=amd64 go install -v github.com/lukin0110/push/cmd/push/
         cp /go/bin/push /output/push.x86.linux
+
+        echo 'Linux arm5'
+        env GOOS=linux GOARCH=arm GOARM=5 go install -v github.com/lukin0110/push/cmd/push/
+        cp /go/bin/linux_arm/push /output/push.arm5.linux
+
+        echo 'Linux arm7'
+        env GOOS=linux GOARCH=arm GOARM=7 go install -v github.com/lukin0110/push/cmd/push/
+        cp /go/bin/linux_arm/push /output/push.arm7.linux
     ;;
     mac)
         echo 'Mac OSX'
