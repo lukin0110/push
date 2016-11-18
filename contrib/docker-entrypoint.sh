@@ -11,7 +11,9 @@ Usage: docker run <imagename> COMMAND
 Commands:
 bash     : Start a bash shell
 release  : Generate release builds
+mac      : Generate release build for OSX
 build    : Build locally for dev purposes
+fetch    : Fetch a Go package, e.g: docker-compose run app fetch github.com/asaskevich/govalidator@v5
 help     : Show this message
 """
 }
@@ -24,14 +26,23 @@ case "$1" in
     release)
         echo 'Mac OSX'
         env GOOS=darwin go install -v github.com/lukin0110/push/cmd/push/
-        cp /go/bin/darwin_amd64/push /go/bin/push.x86.darwin
+        cp /go/bin/darwin_amd64/push /output/push.x86.darwin
         echo 'Linux'
         env GOOS=linux go install -v github.com/lukin0110/push/cmd/push/
-        cp /go/bin/push /go/bin/push.x86.linux
+        cp /go/bin/push /output/push.x86.linux
+    ;;
+    mac)
+        echo 'Mac OSX'
+        env GOOS=darwin go install -v github.com/lukin0110/push/cmd/push/
+        cp /go/bin/darwin_amd64/push /output/push
     ;;
     build)
         echo 'In docker'
         env GOOS=linux go install -v github.com/lukin0110/push/cmd/push/
+    ;;
+    fetch)
+        echo 'Fetching (with govendor)'
+        govendor fetch "${@:2}"
     ;;
     *)
         show_help
