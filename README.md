@@ -27,6 +27,7 @@ Options:
 
  -e, --email        Share files via email
  -p, --passphrase   Protect files with a password
+ -z, --zip          Compress files to one archive
  -h, --help         Print usage
  -v, --version      Print version information and quit
 
@@ -39,6 +40,5 @@ $ push --passphrase=Security007 ./nginx.conf
 
 ## Roadmap
 
-* [Add zip compression](https://github.com/lukin0110/push/issues/3)
 * [Parallel uploads](https://github.com/lukin0110/push/issues/4)
 * [Capture sender info](https://github.com/lukin0110/push/issues/5)
