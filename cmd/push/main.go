@@ -48,7 +48,7 @@ func flagString(nameLong string, nameShort string, value string, usage string) *
     return result
 }
 
-func HandleFile(filePath string, passPhrase string, email string) (url string, err error) {
+func HandleFile(rootUrl string, filePath string, passPhrase string, sender string, email string) (url string, err error) {
     var stat os.FileInfo
     fullPath, err := filepath.Abs(filePath)
 
@@ -81,7 +81,7 @@ func HandleFile(filePath string, passPhrase string, email string) (url string, e
             bar.Start()
             reader := bar.NewProxyReader(uploadFile)
 
-            url, err = file.UploadFile(Url + filename, *uploadFile, reader, email)
+            url, err = file.UploadFile(rootUrl + filename, *uploadFile, reader, sender, email)
             //fmt.Printf("Uploading: %s, %s\n", uploadPath, *email); result := filename
             bar.Finish()
         } else {
@@ -103,6 +103,7 @@ func main() {
 
     email := flagString("email", "e", "", "Share files via email")
     passPhrase := flagString("passphrase", "p", "", "Protect files with a password")
+    sender := flagString("sender", "s", "", "Info about who's sending the file")
     zip := flagBool("zip", "z", false, "Compress files to one archive")
     help := flagBool("help", "h", false, "Print usage")
     kiwi := flagBool("kiwi", "k", false, "Show a ascii art")
@@ -155,7 +156,7 @@ func main() {
                 defer os.Remove(zipfileName)
 
                 var url string
-                url, err = HandleFile(zipfileName, *passPhrase, *email)
+                url, err = HandleFile(Url, zipfileName, *passPhrase, *sender, *email)
                 if url != "" {
                     results = append(results, url)
                 }
@@ -169,7 +170,7 @@ func main() {
     } else {
         // Loopy MacLoopface
         for _, v := range flag.Args() {
-            url, err := HandleFile(v, *passPhrase, *email)
+            url, err := HandleFile(Url, v, *passPhrase, *sender, *email)
             if url != "" {
                 results = append(results, url)
             } else {

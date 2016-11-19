@@ -13,7 +13,7 @@ import (
     "io"
 )
 
-func UploadFile(url string, inputFile os.File, inputReader io.Reader, email string) (string, error) {
+func UploadFile(url string, inputFile os.File, inputReader io.Reader, sender string, email string) (string, error) {
     defer inputFile.Close()
     req, err := http.NewRequest("PUT", url, inputReader)
     if (err != nil) {
@@ -23,6 +23,11 @@ func UploadFile(url string, inputFile os.File, inputReader io.Reader, email stri
     if email != "" {
         req.Header.Set("x-email", email)
     }
+
+    if sender != "" {
+        req.Header.Set("x-sender", sender)
+    }
+
     fileStat, err1 := inputFile.Stat()
     if err1 == nil {
         req.ContentLength = fileStat.Size()
