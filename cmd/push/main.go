@@ -114,7 +114,7 @@ func main() {
         fmt.Println(UsageString)
         os.Exit(0)
     } else if *version {
-        fmt.Println(ver.Full())
+        fmt.Printf("push version %s\n", ver.Full())
         os.Exit(0)
     } else if *kiwi {
         fmt.Print(ver.Kiwi)
