@@ -106,9 +106,18 @@ func main() {
     sender := flagString("sender", "s", "", "Info about who's sending the file")
     zip := flagBool("zip", "z", false, "Compress files to one archive")
     help := flagBool("help", "h", false, "Print usage")
-    kiwi := flagBool("kiwi", "k", false, "Show a ascii art")
     version := flagBool("version", "v", false, "Print version information and quit")
+    kiwi := flagBool("kiwi", "k", false, "Show a ascii art")
+    serve := flagString("serve", "", "80", "Serve a directory")
     flag.Parse()
+
+    if *serve != "" {
+        err := file.Serve(*serve, flag.Args()[0])
+        if err != nil {
+            fmt.Println(err)
+            os.Exit(1)
+        }
+    }
 
     if *help {
         fmt.Println(UsageString)
