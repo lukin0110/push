@@ -106,7 +106,7 @@ func main() {
     sender := flagString("sender", "s", "", "Info about who's sending the file")
     zip := flagBool("zip", "z", false, "Compress files to one archive")
     help := flagBool("help", "h", false, "Print usage")
-    kiwi := flagBool("kiwi", "k", false, "Show a ascii art")
+    kiwi := flagBool("kiwi", "k", false, "Show ascii art")
     version := flagBool("version", "v", false, "Print version information and quit")
     flag.Parse()
 
@@ -131,7 +131,7 @@ func main() {
         os.Exit(0)
     }
 
-    var results = make([]string, 0) // List of urls all successful uploads
+    var results = make([]string, 0) // List of urls of all successful uploads
     var errors = make([]error, 0)   // List of failed uploads (file not found, failed to upload, etc)
 
     if *zip {
@@ -168,7 +168,7 @@ func main() {
         }
 
     } else {
-        // Loopy MacLoopface
+        // Loopy McLoopface
         for _, v := range flag.Args() {
             url, err := HandleFile(Url, v, *passPhrase, *sender, *email)
             if url != "" {
