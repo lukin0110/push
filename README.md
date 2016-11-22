@@ -40,6 +40,5 @@ $ push --passphrase=Security007 ./nginx.conf
 
 ## Roadmap
 
-* [Parallel uploads](https://github.com/lukin0110/push/issues/4)
 * [Create brew package](https://github.com/lukin0110/push/issues/6)
 * [Create windows Binary](https://github.com/lukin0110/push/issues/8)
