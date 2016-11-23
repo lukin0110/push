@@ -27,19 +27,19 @@ case "$1" in
         # Go building
         # https://github.com/golang/go/wiki/GoArm
         echo 'Mac OSX'
-        env GOOS=darwin go install -v github.com/lukin0110/push/cmd/push/
+        env GOOS=darwin go install -ldflags '-w -s' -v github.com/lukin0110/push/cmd/push/
         cp /go/bin/darwin_amd64/push /output/push.x86.darwin
 
         echo 'Linux amd64'
-        env GOOS=linux GOARCH=amd64 go install -v github.com/lukin0110/push/cmd/push/
+        env GOOS=linux GOARCH=amd64 go install -ldflags '-w -s' -v github.com/lukin0110/push/cmd/push/
         cp /go/bin/push /output/push.x86.linux
 
         echo 'Linux arm5'
-        env GOOS=linux GOARCH=arm GOARM=5 go install -v github.com/lukin0110/push/cmd/push/
+        env GOOS=linux GOARCH=arm GOARM=5 go install -ldflags '-w -s' -v github.com/lukin0110/push/cmd/push/
         cp /go/bin/linux_arm/push /output/push.armv5l.linux
 
         echo 'Linux arm7'
-        env GOOS=linux GOARCH=arm GOARM=7 go install -v github.com/lukin0110/push/cmd/push/
+        env GOOS=linux GOARCH=arm GOARM=7 go install -ldflags '-w -s' -v github.com/lukin0110/push/cmd/push/
         cp /go/bin/linux_arm/push /output/push.armv7l.linux
     ;;
     mac)
