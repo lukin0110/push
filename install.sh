@@ -43,9 +43,12 @@ case "$(uname -s)" in
         if [ "$arch" = "unknown" ]; then
             arch="x86"
         fi;
+        if [ "$arch" = "x86_64" ]; then
+            arch="x86"
+        fi;
 
         echo "Installing on Linux $arch"
-        curl -o "$temp_file" -L https://github.com/lukin0110/push/releases/download/$VERSION/push.$arch.linux
+        curl --fail -o "$temp_file" -L https://github.com/lukin0110/push/releases/download/$VERSION/push.$arch.linux
         mv "$temp_file" /usr/local/bin/push
         chmod 755 /usr/local/bin/push
         echo "Installed in /usr/local/bin/push"
