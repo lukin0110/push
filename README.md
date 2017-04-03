@@ -38,6 +38,10 @@ $ push --email=jeffrey@lebowski.org ./nginx.conf
 $ push --passphrase=Security007 ./nginx.conf
 ```
 
+## Server
+
+The code of the server is [open source](https://github.com/TheWebMonks/push.kiwi) as well.
+
 ## Roadmap
 
 * [Create brew package](https://github.com/lukin0110/push/issues/6)
